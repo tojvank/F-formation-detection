@@ -1,6 +1,7 @@
 import itertools
 import math
 import cmath
+# mylist = list(itertools.chain.from_iterable(data))
 
 import numpy as np
 import pandas as pd
@@ -8,8 +9,6 @@ import pandas as pd
 from numpy import random
 #from random import random
 import scipy
-import scipy as scipy
-from scipy.io import loadmat
 from scipy.spatial import distance
 from scipy.stats import norm, beta
 
@@ -36,14 +35,20 @@ def frustumM(pos, orj, length, aperture, samples):
 def frustum():
 
     data = loading()
-    print(data.shape)
-    return data
-    #per piqttire mylist = list(itertools.chain.from_iterable(data))
-    #persons=data[0][0]
+    persons = []
 
-    '''
-    for m in range(0, data.size):
-        persons = data[0][m]
+    for m in range(0, 8):#data.size):
+        persons.append(data[0][m])
+
+
+    print(persons[0])
+    print(len(persons)) # sarebbero anche il numero di persone esistenti in quel gruppo
+    
+    fxx = []
+    for f in range(0, len(persons)):
+    #fx = frustumM(persons[f][1], persons[f][2], persons[f][3], 20,160,2000)
+     ''' 
+
         if persons.size != 0:
 
             minx = math.inf
@@ -52,19 +57,22 @@ def frustum():
             maxy = -math.inf
 
             persons = data[0][m]
-
+            
             fxx = []
 
             for f in range(0, persons.shape[0]):
                 #fx = frustumM([persons[f, 1], persons[f, 2]], persons[f, 3],param['frustumLength'], param['frustumAperture'], param['frustumSamples'])
-                fx = frustumM([59,32], 0.52, 20, 160, 2000)
+                fx = frustumM([persons[f, 1], persons[f, 2]], persons[f, 3], 20, 160, 2000)
+
+                #fx = frustumM([59,32], 0.52, 20, 160, 2000)
                 print("fx", fx)
                 #fxx.append(fx)
                 print("fxx", fxx)
                 print("fxx.shape", len(fxx))
                 print("fx", fx.shape)
             return fxx
-    '''
+            '''
+
     '''
                 plt.scatter(fx[:, 0], fx[:, 1], c=np.random.rand(2000))
             plt.show()
