@@ -24,21 +24,17 @@ param = {'frustumLength': 20, 'frustumAperture': 160, 'frustumSamples': 2000, 'h
 def frustumM(pos, orj, length, aperture, samples):
     pts = []
     ptsFM = np.zeros((samples, 2))
-    aperture = aperture / 2
     leng = np.zeros((samples, 1))
     if length > 0:
         for i in range(0, samples):
             #sigma = ((aperture / 360 * (2 * math.pi))) / 3
-            sigma = (1/3)*(160/2)
+            sigma = (1/3)*(aperture/(2*360*math.pi))
             orj = random.normal(orj, sigma)
             #leng = random.beta(0.8, 1.1, size=(2000,1)) * length
-            leng = random.beta(0.8, 1.1) * length
+            leng = random.beta(0.8, 1.1)
 
-            #leng = np.sort(leng)
-            #print("leng", leng[0])
-
-            ptsFM[i, 0] = pos[0] + np.cos(orj) * leng
-            ptsFM[i, 1] = pos[1] + np.sin(orj) * leng
+            ptsFM[i, 0] = pos[0] + np.cos(orj) * leng * length
+            ptsFM[i, 1] = pos[1] + np.sin(orj) * leng * length
     #print("ptsFM", ptsFM)
     return ptsFM
 
