@@ -16,6 +16,10 @@ import matplotlib.pyplot as plt
 from loading import loading
 
 
+param = {'frustumLength': 20, 'frustumAperture': 160, 'frustumSamples': 2000, 'histnx': 20, 'histny': 20, 'sigma': 0.4, 'method': 'JS', 'checkFacing': 1, 'HO_quantization': 1, 'FillMissDetection': 1,'frustumMode': '', 'checkOverlap': 0, 'weightMode': 'EQUAL', 'numFrames': 1, 'showWeights': 1, 'evalMethod': '', 'showgroups': 1, 'showFrustum': 1, 'showResults': 1}
+
+
+
 
 def frustumM(pos, orj, length, aperture, samples):
     pts = []
@@ -30,25 +34,12 @@ def frustumM(pos, orj, length, aperture, samples):
             ptsFM[i, 0] = pos[0] + np.cos(orj) * leng
             ptsFM[i, 1] = pos[1] + np.sin(orj) * leng
     return ptsFM
-
-
-def frustum():
-
-    data = loading()
-    persons = []
-
-    for m in range(0, 8):#data.size):
-        persons.append(data[0][m])
-
-
-    print(persons[0])
-    print(len(persons)) # sarebbero anche il numero di persone esistenti in quel gruppo
-    
-    fxx = []
-    for f in range(0, len(persons)):
-    #fx = frustumM(persons[f][1], persons[f][2], persons[f][3], 20,160,2000)
-     ''' 
-
+def frustuaaam():
+    data= loading()
+    for m in range(0, np.size(data)):
+        # print("SHAPE DATA", data.shape) #(1,100)
+        persons = data[0][m]
+        #print(persons.shape[1])
         if persons.size != 0:
 
             minx = math.inf
@@ -56,24 +47,100 @@ def frustum():
             maxx = -math.inf
             maxy = -math.inf
 
-            persons = data[0][m]
-            
             fxx = []
-
             for f in range(0, persons.shape[0]):
-                #fx = frustumM([persons[f, 1], persons[f, 2]], persons[f, 3],param['frustumLength'], param['frustumAperture'], param['frustumSamples'])
-                fx = frustumM([persons[f, 1], persons[f, 2]], persons[f, 3], 20, 160, 2000)
+                fx = frustumM([persons[f][1], persons[f][2]], persons[f][3],
+                              param['frustumLength'], param['frustumAperture'],
+                              param['frustumSamples'])
+                fxx.append(fx)
 
-                #fx = frustumM([59,32], 0.52, 20, 160, 2000)
-                print("fx", fx)
-                #fxx.append(fx)
-                print("fxx", fxx)
-                print("fxx.shape", len(fxx))
-                print("fx", fx.shape)
-            return fxx
+                plt.scatter(fx[:, 0], fx[:, 1], c=np.random.rand(2000))  # capire come mettere dello stesso colore
+
+            plt.show()
+
+            #copiate da frustum
+            for m in range(0, 8):  # data.size): dà l'errore dell'indice
+                persons.append(data[0][m])
+
+def frustumMa(pos, orj, length, aperture, samples):
+    pts = []
+    ptsFM = []
+    aperture = aperture/2
+    if length > 0:
+        for i in range(0, samples):
+            sigma = ((aperture/360 *(2*math.pi)))/3
+            orj = norm.rvs(orj, sigma)
+            len = beta.rvs(0.8, 1.1) * length
+            #len = np.sort(len)
+            ptsFM = ptsFM.append((pos[0]+np.cos(orj)*len,pos[1]+np.sin(orj)*len))
+            return ptsFM
+
+
+def frustum():
+
+    data = loading()
+    persons = []
+    for i in range(0, data.size): #100 array
+        # ogni iterazione un array -> 0-99 iterazioni
+        persons = data[0][i]
+        #print(persons.shape)
+        fxx = []
+
+        if persons.size > 0:
+            minx = math.inf
+            miny = math.inf
+            maxx = -math.inf
+            maxy = -math.inf
+
+            fxx = []
+            fuorifx = []
+            for f in range(0, len(persons)):
+                numberofcolors = persons.shape[0]
+                #TODO trovare colori differenti
+                listcolori = ['c', 'y', 'g', 'b', 'm', 'm', 'g', 'r','c', 'c', 'g', 'r']
+                random_color = list(np.random.choice(range(255), size=2000))
+                fx = frustumM([persons[f, 1], persons[f, 2]], persons[f, 3], param['frustumLength'], param['frustumAperture'], param['frustumSamples'])
+                plt.scatter(fx[:, 0], fx[:, 1], marker='o', c=listcolori[f])#"#1E8D5C")#np.random.rand(2000))
+                fxx.append(fx)
+                # print("fxx", fxx)
+                fuorifx = fx
+            plt.show()
             '''
+            for j in range(0, fx.shape[0]):
+                plt.scatter(fx[:, 0], fx[:, 1], c=np.random.rand(2000))
+                #plt.scatter(fx[:, 0], fx[:, 1], c=np.random.rand(2000))
+            plt.show()
+           
+            
 
-    '''
+            #print("fuoriFX", fxx[0])
+            for k in range(0, len(fxx)):
+                xx = fxx[k][0]
+                yy = fxx[k][1]
+                plt.scatter(xx, yy, marker='o', c='r')
+                plt.show()
+            #xx = fuorifx[:, 0]
+            #yy = fuorifx[:, 1]
+            #print("xx", xx)
+            #print("yy", yy)
+            #plt.show()
+            #come stampare un solo FX intanto
+             '''
+
+        '''
+            print("lunghezza", len(fxx))
+            for i in range(0, len(fxx)):
+                print("fxx", fxx[0][0])
+            for s in range(0, len(fxx)):
+                plt.scatter(fxx[i][:, 0], fxx[i][:, 1], c=np.random.rand(2000))
+            plt.show()
+
+                #print("lunghezza fxx", len(fxx))
+
+                    #return fxx
+
+
+    
                 plt.scatter(fx[:, 0], fx[:, 1], c=np.random.rand(2000))
             plt.show()
             
