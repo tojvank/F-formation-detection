@@ -20,7 +20,6 @@ param = {'frustumLength': 20, 'frustumAperture': 160, 'frustumSamples': 2000, 'h
          'checkOverlap': 0, 'weightMode': 'EQUAL', 'numFrames': 1, 'showWeights': 1, 'evalMethod': '', 'showgroups': 1,
          'showFrustum': 1, 'showResults': 1}
 
-
 def frustumM(pos, orj, length, aperture, samples):
     pts = []
     ptsFM = np.zeros((samples, 2))
@@ -37,6 +36,56 @@ def frustumM(pos, orj, length, aperture, samples):
             ptsFM[i, 1] = pos[1] + np.sin(orj) * leng * length
     #print("ptsFM", ptsFM)
     return ptsFM
+
+
+def hist2D(x, y, n_x, n_y, xrange, yrange):
+    # tile repeat copies of array
+    print("x before tile ", x)
+    print(x.shape, "x.shape before")
+
+    # x e y sono solo array, ovvero matrici con m righe e 1 colonna
+    x = x - (np.tile(xrange[0], (x.shape[0], 1)))  # create a x.shape[0] by 1 copies of xrange[0]
+    y = y - (np.tile(yrange[0], (y.shape[0], 1)))
+    print("x", x)
+    print(x.shape, "x.shape dopo")
+
+    m = np.zeros((n_x, n_y))  # 20 x 20
+
+    stepx = (xrange[1] - xrange[0]) / n_x
+    stepy = (yrange[1] - yrange[0]) / n_y
+    # print("stepx", stepx, "stepy", stepy)
+    # LINEARIZZO X E Y
+    linx = np.zeros((np.size(x)))
+    liny = np.zeros((np.size(y)))
+    for k in range(0, np.size(x)):
+        for i in range(0, x.shape[0]):
+            for j in range(0, x.shape[0]):
+                linx[k] = x[i][j]
+                liny[k] = y[i][j]
+
+    # print("linxx", linx)
+    # print("linyy", liny)
+    for j in range(0, np.size(linx)):
+        # print("linx", linx[j])
+        xx = math.ceil(linx[j] / stepx)
+        yy = math.ceil(liny[j] / stepy)
+        # print("xx", xx, "yy", yy)
+
+        if xx == 0:
+            xx = 1
+        if xx > n_x:
+            xx = n_x
+        if yy == 0:
+            yy = 1
+        if yy > n_y:
+            yy = n_y
+
+        # posizioni partono da 0 ed arrivano a 19, quindi ovviamente mi dà errore su 20
+        m[yy][xx] = m[yy][xx] + 1
+
+    m = m / np.size(linx)
+    print("m", m)
+    return m
 
 
 def frustum():
@@ -64,28 +113,30 @@ def frustum():
                               param['frustumAperture'], param['frustumSamples'])
                 plt.scatter(fx[:, 0], fx[:, 1], marker='o', c=listcolori[f])  # "#1E8D5C")#np.random.rand(2000))
                 fxx.append(fx)
-            plt.show()
-            #print("fxxx", fxx[0][0])
-            #print("fxxx", fxx[0][0][0])
-            for m in range(0, len(fxx)):
-                for n in range(0, persons.shape[0]):
+            #plt.show()
+            print("fxxx", len(fxx))
+            #ciclo fxx e salvo in una variabile temporanea
+
+            for n in range(0, persons.shape[0]):
+                for m in range(0, len(fxx)):
                     if minx > fxx[n][m][0]: minx = fxx[n][m][0]
                     if miny > fxx[n][m][1]: miny = fxx[n][m][1]
-                    if maxx > fxx[n][m][0]: maxx = fxx[n][m][0]
-                    if maxy > fxx[n][m][1]: maxy = fxx[n][m][1]
+                    if maxx < fxx[n][m][0]: maxx = fxx[n][m][0]
+                    if maxy < fxx[n][m][1]: maxy = fxx[n][m][1]
 
-'''
+
             px = np.zeros(shape=persons.shape[0])
             hx = np.zeros(shape=(param['histnx'], param['histny']))
             #hx = np.zeros(shape=persons.shape[0])
             pxhist = np.zeros(shape=(persons.shape[0],400))
 
-            for i in range(0, persons.shape[0]):            
+            for h in range(0, persons.shape[0]):
                 # get the 2D histogram for each person  
-                hx = hist2D(fxx[:,0], fxx[:,1], param['histnx'], param['histny'],[minx, maxx], [miny, maxy])
+                hx = hist2D(fxx[h][:,0], fxx[h][:,1], param['histnx'], param['histny'], [minx, maxx], [miny, maxy])
 
                 #print("hx", hx)
                 #print("hx.shape", hx.shape)
+'''
                 # create a row vector of the histogram - linearize
                 px = np.reshape(a=(hx), newshape=(param['histnx']* param['histny']))
 
