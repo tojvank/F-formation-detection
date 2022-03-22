@@ -71,6 +71,7 @@ def hist2D(x, y, n_x, n_y, xrange, yrange):
         yy = math.ceil(liny[j] / stepy)
         # print("xx", xx, "yy", yy)
 
+
         if xx == 0:
             xx = 1
         if xx > n_x:
