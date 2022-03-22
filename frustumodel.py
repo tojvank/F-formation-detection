@@ -6,6 +6,7 @@ import cmath
 import numpy as np
 import pandas as pd
 
+import seaborn as sns
 from numpy import random
 # from random import random
 import scipy
@@ -175,21 +176,16 @@ def frustum():
 
                 for j in range(0, np.size(px)):
                     pxhist[h][j] = px[j]
-                    print("pxhist", pxhist[h][j])
+                    #print("pxhist", pxhist[h][j])
 
-                plt.hist(pxhist[h,:], bins = 100) # appare solo la colonna
-                plt.show()
+                #plt.imshow(hx, cmap='hot', interpolation='nearest')#, bins = 100)
+
+                # migliora colori
+                #ax = sns.heatmap(hx)
+                #plt.show()
 
 
-'''
-              plt.hist(pxhist[i,:], bins = 100) # appare solo la colonna
-                # plt.show()  
 
-                
-
-            #print("la prima riga", pxhist[0,:])
-            
-'''
 '''
             # evaluate pairwise affinity matrix
             if np.size(pxhist) > 1:
