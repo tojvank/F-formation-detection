@@ -16,6 +16,9 @@ from scipy.stats import norm, beta
 import matplotlib.pyplot as plt
 from loading import loading
 
+from scipy.stats import entropy
+from numpy.linalg import norm
+
 param = {'frustumLength': 20, 'frustumAperture': 160, 'frustumSamples': 2000, 'histnx': 20, 'histny': 20, 'sigma': 0.4,
          'method': 'JS', 'checkFacing': 1, 'HO_quantization': 1, 'FillMissDetection': 1, 'frustumMode': '',
          'checkOverlap': 0, 'weightMode': 'EQUAL', 'numFrames': 1, 'showWeights': 1, 'evalMethod': '', 'showgroups': 1,
@@ -42,8 +45,8 @@ def frustumM(pos, orj, length, aperture, samples):
 
 def hist2D(x, y, n_x, n_y, xrange, yrange):
     # tile repeat copies of array
-    #print("x before tile ", x)
-    #print(x.shape, "x.shape before")
+    # print("x before tile ", x)
+    # print(x.shape, "x.shape before")
 
     # x e y sono solo array, ovvero matrici con m righe e 1 colonna
     x = x - (np.tile(xrange[0], (x.shape[0], 1)))  # create a x.shape[0] by 1 copies of xrange[0]
@@ -91,6 +94,7 @@ def hist2D(x, y, n_x, n_y, xrange, yrange):
     print("m", m)
     return m
 
+
 def histt(x, y, n_x, n_y, xrange, yrange):
     # x = x - (np.tile(xrange[0], (x.shape[0], 1)))
     # y = y - (np.tile(yrange[0], (y.shape[0], 1)))
@@ -114,17 +118,59 @@ def histt(x, y, n_x, n_y, xrange, yrange):
         if xx == 0:
             xx = 0
         if xx >= n_x:
-            xx = n_x-1
+            xx = n_x - 1
         if yy == 0:
             yy = 0
         if yy >= n_y:
-            yy = n_y-1
+            yy = n_y - 1
 
-        m[yy][xx] = m[yy][xx]+1
+        m[yy][xx] = m[yy][xx] + 1
 
     m = m / np.size(xxx)
     # print("m", m)
     return m
+
+
+def kldiv(A, B):
+    return np.sum([v for v in A * np.log2(A / B) if not np.isnan(v)])
+
+
+def kl(p, q):
+    ab = np.array(p.size)
+    for i in range(0, p.size):
+        ab[i] = p[i] * np.log(p[i] / q[i])
+    return np.sum(ab)
+
+
+def jsjs(p, q):
+    # pp = p/norm(p,ord=1)
+    # qq=q/norm(q,ord=1)
+    pp = np.array(p)
+    qq = np.array(q)
+    mm = 0.5 * (pp + qq)
+    return 0.5 * (kl(pp, mm) + kl(qq, mm))
+    # return 0.5 * (entropy(pp, mm) + entropy(qq,mm))
+
+
+def kl_divergence(p, q):
+    somma=np.zeros(len(p))
+    for i in range(0, len(p)):
+        if(q[i]):
+            somma[i]=sum(p[i] * np.log2(p[i] / q[i]))
+        #return sum(p[i] * np.log2(p[i] / q[i]) for i in range(len(p)))
+        return somma
+
+
+def js_divergence(p, q):
+
+    m=np.zeros(len(p))
+    aa=[]
+    for i in range(0, len(p)):
+        m = 0.5 * (p[i] + q[i])
+        aa = 0.5 * kl_divergence(p, m) + 0.5 * kl_divergence(q, m)
+    #m = 0.5 * (p + q)
+    #return 0.5 * kl_divergence(p, m) + 0.5 * kl_divergence(q, m)
+    return aa
 
 def frustum():
     data = loading()
@@ -176,17 +222,42 @@ def frustum():
 
                 for j in range(0, np.size(px)):
                     pxhist[h][j] = px[j]
-                    #print("pxhist", pxhist[h][j])
+                    # print("pxhist", pxhist[h][j])
 
-                #plt.imshow(hx, cmap='hot', interpolation='nearest')#, bins = 100)
+                # plt.imshow(hx, cmap='hot', interpolation='nearest')#, bins = 100)
 
                 # migliora colori
-                #ax = sns.heatmap(hx)
-                #plt.show()
+                # ax = sns.heatmap(hx)
+                # plt.show()
 
+            if np.size(pxhist) > 1:
+                # matrice quadrata numero persone * numero persone
+                distmat = np.zeros(shape=(pxhist.shape[0], pxhist.shape[0]))
+                if param['method'] == 'JS':
+                    for k in range(0, 5):
+                        for i in range(0, pxhist.shape[0]):
+                            for j in range(i, pxhist.shape[0]):
+                                # todo: vedere se mettere alla seconda o meno
+                                #distmat[i][j] = js_divergence(p=pxhist[i], q=pxhist[j])
+                                distmat[i] = js_divergence(p=pxhist, q=pxhist)
+
+                                # distmat[i][j] = distance.jensenshannon(p=pxhist[i, :], q=pxhist[j, :]) ** 2
+                                # distmat[i][j] =js(p=pxhist[i,:], q=pxhist[j,:])
+                                #distmat[j][i] = distmat[i][j]
+                print("distmat", distmat)
 
 
 '''
+                affinitymat = np.zeros(shape=(distmat.shape[0], distmat.shape[0]))
+                for i in range(0, distmat.shape[0]):
+                    for j in range(0, distmat.shape[0]):
+                        affinitymat[i][j] = math.exp(-distmat[i][j] / param['sigma'])  # * (not (np.eye(distmat.shape[0], distmat.shape[1])))
+
+                # affinitymat = affinitymat * m
+                #print("affinitymat", affinitymat)
+
+
+
             # evaluate pairwise affinity matrix
             if np.size(pxhist) > 1:
                 #matrice quadrata numero persone * numero persone
