@@ -216,13 +216,17 @@ def frustum():
                 hx = histt(fxx[h][:, 0], fxx[h][:, 1], param['histnx'], param['histny'], [minx, maxx], [miny, maxy])
 
                 # print("hx", hx)
+
                 # create a row vector of the histogram - linearize
-                px = np.reshape(a=(hx), newshape=(param['histnx'] * param['histny']))
+                px = np.reshape(a=hx, newshape=(param['histnx'] * param['histny']))
                 # print("px.shape", px.shape) # (400,)
+
 
                 for j in range(0, np.size(px)):
                     pxhist[h][j] = px[j]
                     # print("pxhist", pxhist[h][j])
+
+                #print("somma", np.sum(px))
 
                 # plt.imshow(hx, cmap='hot', interpolation='nearest')#, bins = 100)
 
@@ -239,7 +243,7 @@ def frustum():
                             for j in range(i, pxhist.shape[0]):
                                 # todo: vedere se mettere alla seconda o meno
                                 #distmat[i][j] = js_divergence(p=pxhist[i], q=pxhist[j])
-                                distmat[i] = js_divergence(p=pxhist, q=pxhist)
+                                distmat[i] = jsjs(p=pxhist[i], q=pxhist[j])
 
                                 # distmat[i][j] = distance.jensenshannon(p=pxhist[i, :], q=pxhist[j, :]) ** 2
                                 # distmat[i][j] =js(p=pxhist[i,:], q=pxhist[j,:])
