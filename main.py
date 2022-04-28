@@ -1,35 +1,67 @@
 from frustumodel import frustum, frustumM
-
 from sklearn.metrics import pairwise_distances
 from scipy.spatial.distance import pdist, squareform
 from sklearn.datasets import make_blobs
 import matplotlib.pyplot as plt
 from ds import *
-
+import numpy as np
 import pandas as pd
+import math
 
-param = {'frustumLength': 20, 'frustumAperture': 160, 'frustumSamples': 2000, 'histnx': 20, 'histny': 20, 'sigma': 0.4, 'method': 'JS', 'checkFacing': 1, 'HO_quantization': 1, 'FillMissDetection': 1,'frustumMode': '', 'checkOverlap': 0, 'weightMode': 'EQUAL', 'numFrames': 1, 'showWeights': 1, 'evalMethod': '', 'showgroups': 1, 'showFrustum': 1, 'showResults': 1}
+param = {'frustumLength': 20, 'frustumAperture': 160, 'frustumSamples': 2000, 'histnx': 20, 'histny': 20, 'sigma': 0.4,
+         'method': 'JS', 'checkFacing': 1, 'HO_quantization': 1, 'FillMissDetection': 1, 'frustumMode': '',
+         'checkOverlap': 0, 'weightMode': 'EQUAL', 'numFrames': 1, 'showWeights': 1, 'evalMethod': '', 'showgroups': 1,
+         'showFrustum': 1, 'showResults': 1}
 
 if __name__ == '__main__':
 
     frustum()
-    
+    #x = dominant_set(m)
+    #print("x", x)
+    '''
+    matrice = frustum()
+    print("matrice distanza", matrice)
 
+    affinity = np.zeros(np.size(matrice))
+    # matrice di affinità
 
-'''
-if __name__ == "__main__":
+    for i in range(0, np.size(matrice)):
+        for j in range(0, np.size(matrice)):
+            affinity[i][j] = math.exp(matrice[i][j]/0.4)
+        print("matrice affinità", affinity)
 
-    np.random.seed(1)
+    x = dominant_set(matrice, epsilon=2e-4)
+    print("x", x)
+    idx = np.argsort(matrice)[::-1]
+    B = matrice[idx, :][:, idx]
+
+    plt.figure()
+    plt.semilogy(np.sort(matrice))
+    plt.title('Sorted weighted characteristic vector (matrice)')
 
     n = 1000
     d = 2
 
     X, y = make_blobs(n, d, centers=3)
 
+    cutoff = np.median(matrice[matrice > 0])
+    print("cutoff:", cutoff)
+    plt.figure()
+    plt.plot(X[matrice <= cutoff, 0], X[matrice <= cutoff, 1])
+    plt.plot(X[matrice > cutoff, 0], X[matrice > cutoff, 1], 'ro')
+    plt.title("Dominant set")
+
+    plt.show()
+
+if __name__ == "__main__":
+
+    np.random.seed(1)
+    n = 1000
+    d = 2
+    X, y = make_blobs(n, d, centers=3)
+
     D = pairwise_distances(X, metric='sqeuclidean')
-
     sigma2 = np.median(D)
-
     S = np.exp(-D / sigma2)
 
     x = dominant_set(S, epsilon=2e-4)
@@ -62,12 +94,18 @@ if __name__ == "__main__":
     plt.title("Dominant set")
 
     plt.show()
-    
-    DF_var = pd.DataFrame.from_dict({"s1": [1.2, 3.4, 10.2],
-                                     "s2": [1.4, 3.1, 10.7],
-                                     "s3": [2.1, 3.7, 11.3],
-                                     "s4": [1.5, 3.2, 10.9]})
-    DF_var.index = ["g1", "g2", "g3"]
+
+    DF_var = np.array( [[0., 0.18115281, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718],
+               [0.18115281, 0., 0.69314718, 0.69314718, 0.69314718, 0.69314718,  0.69314718, 0.69314718, 0.69314718, 0.69314718],
+               [0.69314718, 0.69314718, 0., 0.29910192, 0.69314718, 0.69314718,   0.69314718, 0.69314718, 0.69314718, 0.69314718],
+               [0.69314718, 0.69314718, 0.29910192, 0., 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718],
+               [0.69314718, 0.69314718, 0.69314718, 0.69314718, 0., 0.69314718,  0.69314718, 0.69314718, 0.69314718, 0.69314718],
+               [0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.,  0.69314718, 0.69314718, 0.69314718, 0.69314718],
+               [0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0., 0.69314718, 0.69314718, 0.69314718],
+               [0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0., 0.69314718, 0.69314718],
+               [0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0., 0.69314718],
+               [0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.69314718, 0.]])
+
     mat = squareform(pdist(DF_var, metric='euclidean'))
     print(mat)
     mat1 = dominant_set(mat, epsilon=2e-4)
@@ -79,8 +117,7 @@ if __name__ == "__main__":
     plt.figure()
     plt.plot(Z[mat1 <= cutoff, 0], Z[mat1 <= cutoff, 1], 'bo')
     plt.plot(Z[mat1 > cutoff, 0], Z[mat1 > cutoff, 1], 'ro')
-    plt.title("Dominant set")
+    plt.title("Dominant set con mat1")
     plt.show()
-    
 '''
 

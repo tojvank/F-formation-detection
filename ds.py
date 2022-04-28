@@ -4,7 +4,8 @@ from numpy.linalg import norm
 
 def dominant_set(A, x=None, epsilon=1.0e-4):
     """Compute the dominant set of the similarity matrix A with the
-    replicator dynamics optimization approach. Convergence is reached
+
+    . Convergence is reached
     when x changes less than epsilon.
     """
     if x is None:
