@@ -106,12 +106,17 @@ def histt(x, y, n_x, n_y, xrange, yrange):
     # print("stepx", stepx, "stepy", stepy)
     xxx = x.flatten()
     yyy = y.flatten()
-
+    #todo entrambi xrange hanno lo stesso valore quindi divisione per zero
+    #lo stesso vale per yrange
+    print(xrange[0], xrange[1], yrange[0], yrange[1] )
     # for i in range(0, np.size(xxx)):
     #   print(i, xxx[i], yyy[i])
 
     for j in range(0, np.size(xxx)):
+        print("xxx", xxx)
+        print("stepx", stepx)
 
+        #print(273,79870221/)
         xx = math.ceil(xxx[j] / stepx)
         yy = math.ceil(yyy[j] / stepy)
         # print("xx", xx, "yy", yy)
