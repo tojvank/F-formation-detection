@@ -9,6 +9,7 @@ import pandas as pd
 import math
 
 from loading import loading
+from dbscanC import dbscanClustering
 
 param = {'frustumLength': 20, 'frustumAperture': 160, 'frustumSamples': 2000, 'histnx': 20, 'histny': 20, 'sigma': 0.4,
          'method': 'JS', 'checkFacing': 1, 'HO_quantization': 1, 'FillMissDetection': 1, 'frustumMode': '',
@@ -18,7 +19,8 @@ param = {'frustumLength': 20, 'frustumAperture': 160, 'frustumSamples': 2000, 'h
 if __name__ == '__main__':
     #data = loading()
 
-    frustum()
+    #frustum()
+    dbscanClustering()
     #x = dominant_set(m)
     #print("x", x)
     '''

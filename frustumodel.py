@@ -47,7 +47,6 @@ def hist2D(x, y, n_x, n_y, xrange, yrange):
     # tile repeat copies of array
     # print("x before tile ", x)
     # print(x.shape, "x.shape before")
-
     # x e y sono solo array, ovvero matrici con m righe e 1 colonna
     x = x - (np.tile(xrange[0], (x.shape[0], 1)))  # create a x.shape[0] by 1 copies of xrange[0]
     y = y - (np.tile(yrange[0], (y.shape[0], 1)))
@@ -100,6 +99,9 @@ def histt(x, y, n_x, n_y, xrange, yrange):
     # y = y - (np.tile(yrange[0], (y.shape[0], 1)))
     # x = x[0][:, 0]
     m = np.zeros((n_x, n_y))
+
+    #print("ranges != 0", xrange[0], yrange[0], xrange[1], yrange[1])
+
     # TODO se mai dovrebbero esserci problemi con i dati in matrici distanza o affinità probabilmente è perche non ho replicato il vettore in forma matrice qui
     stepx = (xrange[1] - xrange[0]) / n_x
     stepy = (yrange[1] - yrange[0]) / n_y
@@ -108,13 +110,12 @@ def histt(x, y, n_x, n_y, xrange, yrange):
     yyy = y.flatten()
     #todo entrambi xrange hanno lo stesso valore quindi divisione per zero
     #lo stesso vale per yrange
-    print(xrange[0], xrange[1], yrange[0], yrange[1] )
     # for i in range(0, np.size(xxx)):
     #   print(i, xxx[i], yyy[i])
 
     for j in range(0, np.size(xxx)):
-        print("xxx", xxx)
-        print("stepx", stepx)
+        #print("xxx", xxx)
+        #print("stepx", stepx)
 
         #print(273,79870221/)
         xx = math.ceil(xxx[j] / stepx)
@@ -132,7 +133,7 @@ def histt(x, y, n_x, n_y, xrange, yrange):
         m[yy][xx] = m[yy][xx] + 1
 
     m = m / np.size(xxx)
-    # print("m", m)
+    #print("m", m)
     return m
 
 
@@ -258,25 +259,25 @@ def frustum():
                         for i in range(0, pxhist.shape[0]):
                             for j in range(i, pxhist.shape[0]):
                                 # todo: vedere se mettere alla seconda o meno
-                                distmat[i][j] = jjs(p=pxhist[i], q=pxhist[j])
+                                #distmat[i][j] = jjs(p=pxhist[i], q=pxhist[j])
 
-                                #distmat[i][j] = distance.jensenshannon(p=pxhist[i, :], q=pxhist[j, :]) ** 2
+                                distmat[i][j] = distance.jensenshannon(p=pxhist[i, :], q=pxhist[j, :]) ** 2
                                 # distmat[i][j] =js(p=pxhist[i,:], q=pxhist[j,:])
                                 distmat[j][i] = distmat[i][j]
                 #print("distmat", distmat)
-                #return distmat
+                return distmat
 
-
+'''
                 affinitymat = np.zeros(shape=(distmat.shape[0], distmat.shape[0]))
                 for i in range(0, distmat.shape[0]):
                     for j in range(0, distmat.shape[0]):
                         affinitymat[i][j] = math.exp(-distmat[i][j] / param['sigma'])  # * (not (np.eye(distmat.shape[0], distmat.shape[1])))
 
                 #affinitymat = affinitymat * m
-                print("affinitymat", affinitymat)
+                #print("affinitymat", affinitymat)
                 return affinitymat
 
-'''
+
             # evaluate pairwise affinity matrix
             if np.size(pxhist) > 1:
                 #matrice quadrata numero persone * numero persone
